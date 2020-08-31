@@ -26,6 +26,7 @@ class ChatConsumer(WebsocketConsumer):
     def receive(self, text_data):
         text_data_json = json.loads(text_data)
         message = text_data_json['message']
+        
 
         # Send message to room group
         async_to_sync(self.channel_layer.group_send)(
@@ -40,7 +41,14 @@ class ChatConsumer(WebsocketConsumer):
     def chat_message(self, event):
         message = event['message']
 
-        # Send message to WebSocket
-        self.send(text_data=json.dumps({
-            'message': message
+        ping = message
+
+        if ping == "__ping__":
+            self.send(text_data=json.dumps({
+            'message': "__pong__"
         }))
+
+        else:
+            self.send(text_data=json.dumps({
+                'message': message
+            }))
